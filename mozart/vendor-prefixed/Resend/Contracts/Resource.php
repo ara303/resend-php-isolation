@@ -1,0 +1,10 @@
+<?php
+
+namespace MozartTest\Resend\Contracts;
+
+use ArrayAccess;
+use JsonSerializable;
+interface Resource extends ArrayAccess, JsonSerializable
+{
+    //
+}

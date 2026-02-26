@@ -1,0 +1,13 @@
+{
+    "name": "ara303/test-resend",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "ara303",
+            "email": "769754+ara303@users.noreply.github.com"
+        }
+    ],
+    "require": {
+        "resend/resend-php": "^1.1"
+    }
+}

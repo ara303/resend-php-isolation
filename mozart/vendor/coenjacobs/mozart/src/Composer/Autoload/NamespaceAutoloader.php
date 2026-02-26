@@ -1,0 +1,117 @@
+<?php
+
+namespace CoenJacobs\Mozart\Composer\Autoload;
+
+use CoenJacobs\Mozart\FilesHandler;
+use Symfony\Component\Finder\SplFileInfo;
+
+abstract class NamespaceAutoloader extends AbstractAutoloader
+{
+    public string $namespace = '';
+
+    /**
+     * The subdir of the vendor/domain/package directory that contains the files
+     * for this autoloader type.  e.g. src/
+     *
+     * @var string[]
+     */
+    public array $paths = [];
+
+    private FilesHandler $fileHandler;
+
+    /**
+     * A package's composer.json config autoload key's value, where $key is
+     * `psr-0`|`psr-4`|`classmap`.
+     *
+     * @inheritdoc
+     */
+    public function processConfig($autoloadConfig): void
+    {
+        if (is_array($autoloadConfig)) {
+            foreach ($autoloadConfig as $path) {
+                array_push($this->paths, $path);
+            }
+
+            return;
+        }
+        array_push($this->paths, $autoloadConfig);
+    }
+
+    public function setNamespace(string $namespace): void
+    {
+        $this->namespace = $namespace;
+    }
+
+    public function getNamespace(): string
+    {
+        return rtrim($this->namespace, '\\') . '\\';
+    }
+
+    public function getSearchNamespace(): string
+    {
+        return rtrim($this->namespace, '\\');
+    }
+
+    public function getNamespacePath(): string
+    {
+        return '';
+    }
+
+    /**
+     * @return array<string,SplFileInfo>
+     */
+    public function getFiles(FilesHandler $fileHandler): array
+    {
+        $this->fileHandler = $fileHandler;
+        $filesToMove = array();
+
+        foreach ($this->paths as $path) {
+            $sourcePath = $fileHandler->getConfig()->getWorkingDir() . 'vendor' . DIRECTORY_SEPARATOR
+                        . $this->getPackage()->getDirectoryName() . DIRECTORY_SEPARATOR . $path;
+
+            $sourcePath = str_replace('/', DIRECTORY_SEPARATOR, $sourcePath);
+
+            if (!is_dir($sourcePath)) {
+                continue;
+            }
+
+            $files = $fileHandler->getFilesFromPath($sourcePath);
+
+            foreach ($files as $foundFile) {
+                $filePath = $foundFile->getRealPath();
+                $filesToMove[ $filePath ] = $foundFile;
+            }
+        }
+
+        return $filesToMove;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTargetFilePath(SplFileInfo $file): string
+    {
+        $suffix = '';
+        foreach ($this->paths as $path) {
+            $directoryName = $this->getPackage()->getDirectoryName();
+            $searchPath = str_replace('/', DIRECTORY_SEPARATOR, $directoryName . DIRECTORY_SEPARATOR . $path);
+            if (str_contains($file->getPathname(), $searchPath)) {
+                $suffix = $path;
+                break;
+            }
+        }
+
+        $replaceWith = $this->fileHandler->getConfig()->getDepDirectory() . $this->getNamespacePath();
+        $targetFile = str_replace($this->fileHandler->getConfig()->getWorkingDir(), $replaceWith, $file->getPathname());
+
+        $directoryName = $this->getPackage()->getDirectoryName();
+        $packageVendorPath = DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . $directoryName;
+
+        if (! empty($suffix)) {
+            $packageVendorPath = $packageVendorPath . DIRECTORY_SEPARATOR . $suffix;
+        }
+
+        $packageVendorPath = str_replace('/', DIRECTORY_SEPARATOR, $packageVendorPath);
+        return str_replace($packageVendorPath, DIRECTORY_SEPARATOR, $targetFile);
+    }
+}

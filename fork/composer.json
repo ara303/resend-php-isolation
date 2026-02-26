@@ -1,0 +1,19 @@
+{
+    "name": "ara303/test-resend",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "ara303",
+            "email": "769754+ara303@users.noreply.github.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/ara303/resend-php.git"
+        }
+    ],
+    "require": {
+        "resend/resend-php": "dev-experimental/rewriteable-namespace"
+    }
+}

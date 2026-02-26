@@ -1,0 +1,38 @@
+{
+    "name": "pc/test-resend",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "ara303",
+            "email": "769754+ara303@users.noreply.github.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/ara303/resend-php.git"
+        }
+    ],
+    "require": {
+        "resend/resend-php": "dev-experimental/rewriteable-namespace"
+    },
+    "autoload": {
+        "classmap": [
+            "vendor-prefixed/"
+        ]
+    },
+    "require-dev": {
+        "coenjacobs/mozart": "^1.1"
+    },
+    "extra": {
+        "mozart": {
+            "dep_namespace": "MozartTest\\",
+            "dep_directory": "/vendor-prefixed/",
+            "classmap_directory": "/vendor-prefixed/composer/",
+            "classmap_prefix": "MozartTest_",
+            "packages": [
+                "resend/resend-php"
+            ]
+        }
+    }
+}
